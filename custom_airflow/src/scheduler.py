@@ -1,22 +1,23 @@
+import os
 import sys
 from pathlib import Path
-import pytz
 import logging
-
-
 import time
 import importlib.util
-from dotenv import load_dotenv
-import os
 from datetime import datetime
+from zoneinfo import ZoneInfo 
+
+from dotenv import load_dotenv
+
 from croniter import croniter
 
-from .models import DAGModel, TaskModel, ExecutionModel, get_session, TaskStatus
+from .models import DAGModel, get_session  #TaskModel, ExecutionModel,  TaskStatus
 
-from .dag_parser import DAG
-import schedule
+#from .dag_parser import DAG
+#import schedule
 
 
+timezone = ZoneInfo("UTC") 
 
 # Configuração do Logging
 logging.basicConfig(
@@ -31,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Obtém o diretório do projeto (raiz do repositório)
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent  
 
 
 
@@ -70,8 +71,8 @@ else:
 logger.info(f"sys.path: {sys.path}")
 
 # Diretório das DAGs
-dags_path = BASE_DIR / 'dags'
-logger.info(f"Caminho das DAGs: {dags_path}")
+dags_path = BASE_DIR /'custom_airflow'/ 'dags'
+logger.info(f"Caminho 'das DAGs: {dags_path}")
 
 # Mapeamento de DAGs: nome -> {'dag': DAG, 'next_run': datetime}
 dag_schedule = {}
@@ -119,7 +120,7 @@ def initialize_dags():
                 session.close()
                 
                 # Calcular o próximo horário de execução
-                now = datetime.now(pytz.UTC)
+                now = datetime.now(timezone)
                 cron = croniter(dag.schedule_interval, now)
                 next_run = cron.get_next(datetime)
                 
@@ -139,7 +140,7 @@ def initialize_dags():
                     dag_schedule[dag.name]['dag'] = dag
                     dag_schedule[dag.name]['file_mtime'] = current_mtime
                     # Recalcular o próximo run
-                    now = datetime.now(pytz.UTC)
+                    now = datetime.now(timezone)
                     cron = croniter(dag.schedule_interval, now)
                     next_run = cron.get_next(datetime)
                     dag_schedule[dag.name]['next_run'] = next_run
@@ -149,7 +150,7 @@ def check_and_run_dags():
     """
     Verifica quais DAGs estão programadas para execução e as executa se necessário.
     """
-    now = datetime.now(pytz.UTC)
+    now = datetime.now(timezone)
     for dag_name, info in dag_schedule.items():
         dag = info['dag']
         next_run = info['next_run']
@@ -187,7 +188,7 @@ def scan_for_new_dags():
                 session.close()
                 
                 # Calcular o próximo horário de execução
-                now = datetime.now(pytz.UTC)
+                now = datetime.now(timezone)
                 cron = croniter(dag.schedule_interval, now)
                 next_run = cron.get_next(datetime)
                 
@@ -207,7 +208,7 @@ def scan_for_new_dags():
                     dag_schedule[dag.name]['dag'] = dag
                     dag_schedule[dag.name]['file_mtime'] = current_mtime
                     # Recalcular o próximo run
-                    now = datetime.now(pytz.UTC)
+                    now = datetime.now(timezone)
                     cron = croniter(dag.schedule_interval, now)
                     next_run = cron.get_next(datetime)
                     dag_schedule[dag.name]['next_run'] = next_run
@@ -227,7 +228,7 @@ def main():
         check_and_run_dags()
         
         # Aguardar 15 segundos antes de próxima verificação
-        time.sleep(15)
+        time.sleep(5)
 
 if __name__ == '__main__':
     main()

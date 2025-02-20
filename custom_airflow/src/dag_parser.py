@@ -3,11 +3,9 @@ from collections import defaultdict
 from typing import List, Dict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-import pytz
-
+from zoneinfo import ZoneInfo  # Alternativa ao pytz
 from .executor import Executor
 from .models import DAGModel, TaskModel, ExecutionModel, get_session, TaskStatus
-
 
 # Configuração do Logging
 logging.basicConfig(
@@ -22,11 +20,16 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class Task:
-    def __init__(self, name: str, script_path: str, dependencies: List[str] = [], retries: int = 3, timeout: int = 60):
+    def __init__(self, name: str, 
+                 script_path: str, 
+                 dependencies: List[str] = [],
+                 #status: str = 'pending',
+                 retries: int = 3, 
+                 timeout: int = 60):
         self.name = name
         self.script_path = script_path
         self.dependencies = dependencies
-        self.status = 'pending'  # Pode ser 'pending', 'running', 'success', 'failed'
+        #self.status = 'pending'  # Pode ser 'pending', 'running', 'success', 'failed'
         self.retries = retries
         self.timeout = timeout
 
@@ -35,7 +38,7 @@ class DAG:
         self.name = name
         self.schedule_interval = schedule_interval  # Expressão cron
         self.tasks: Dict[str, Task] = {}
-        self.timezone = pytz.UTC  # Defina o fuso horário conforme necessário
+        self.timezone = ZoneInfo("UTC")  # Defina o fuso horário conforme necessário
 
     def add_task(self, task: Task):
         # Validar se as dependências referenciadas existem

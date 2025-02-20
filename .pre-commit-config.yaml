@@ -11,13 +11,13 @@ repos:
             "-rn", # Only display messages
             "-sn", # Don't display the score
             "--rcfile=.pylintrc", # Link to your config file
-            "--load-plugins=../.pylint.extensions.docparams", # Load an extension
+            "--load-plugins=pylint.extensions.docparams", # Load an extension
           ]
   - repo: local
     hooks:
       - id: requirements
         name: requirements
-        entry: python ../update_requirements.py #bash -c 'venv/bin/pip3 freeze > requirements.txt; git add requirements.txt'
+        entry: python ./update_requirements.py #bash -c 'venv/bin/pip3 freeze > requirements.txt; git add requirements.txt'
         language: system
         pass_filenames: false
         stages: [pre-commit]

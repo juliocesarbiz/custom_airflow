@@ -14,7 +14,8 @@ disable=
       w1203,
       C0304, # Final newline missing
       C0305, # Trailing newlines
-      C0303, #Trailing whitespace
+      C0303, # Trailing whitespace
+      C0301, # Line too long
 
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and

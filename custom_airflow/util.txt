@@ -1,3 +1,0 @@
-Executar as Migrações do Banco de Dados
-
-python -c "from models import Base, get_session; Base.metadata.create_all(get_session().bind)"
