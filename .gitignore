@@ -1,0 +1,17 @@
+# Ambientes virtuais
+venv/
+**/venv/
+
+# Arquivos compilados
+__pycache__/
+.pytest_cache
+*.pyc
+
+# Configurações de ambiente
+# .env
+
+# Arquivos de log
+*.log
+
+# Migrations compiladas
+alembic/versions/*.pyc
